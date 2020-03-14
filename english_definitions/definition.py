@@ -1,8 +1,8 @@
 # A program that returns english-word definitions
 
 import requests
-import json
 import os
+import sys
 
 import secure
 
@@ -42,7 +42,10 @@ def print_definition(results):
 
 
 if __name__ == "__main__":
-    word = "Example"
+    if len(sys.argv) != 2:
+        raise Exception("Expected 2 argument, Found {0} argument. Format: 'python definition.py awesome'".format(len(sys.argv)))
+
+    word = sys.argv[-1]
 
     dirname, _ = os.path.split(os.path.abspath(__file__))
     filename = os.path.join(dirname, "oxford_api_key.enc")
