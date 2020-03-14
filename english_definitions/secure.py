@@ -42,9 +42,10 @@ def encrypt_file(password, filename):
             return
         raise FileNotFoundError("{0} not exists".format(filename))
 
-    _, _filename = os.path.split(filename)
-    if _filename.endswith(".enc"):
-        print("{0} is already encrypted".format(_filename))
+    _dirname, _filename = os.path.split(filename)
+    _filename = _filename + '.enc'
+    if os.path.exists(os.path.join(_dirname, _filename)):
+        print("An encrypted file with the same name '{0}', is already present".format(_filename))
         return
 
     key = get_key(password=password)
@@ -61,7 +62,7 @@ def encrypt_file(password, filename):
         os.remove(filename)
 
 
-def decrypt_file_and_read(password, filename):
+def decrypt_file(password, filename):
     if not os.path.exists(filename):
         raise FileNotFoundError("{0} not exists".format(filename))
 
@@ -71,7 +72,14 @@ def decrypt_file_and_read(password, filename):
 
     fernet = Fernet(key)
     decrypted = fernet.decrypt(token=data)
-    return decrypted.decode()
+
+    lines = decrypted.decode().split("\n")
+    app_keys = {}
+    for line in lines:
+        line_key = line.strip().split("=")[0].strip()
+        line_value = line.strip().split("=")[1].strip()
+        app_keys[line_key] = line_value
+    return app_keys
 
 
 if __name__ == "__main__":
@@ -82,4 +90,4 @@ if __name__ == "__main__":
     encrypt_file(password=password, filename=filename)
 
     filename = "{0}.enc".format(filename)
-    decrypt_file_and_read(password, filename)
+    print(decrypt_file(password, filename))

@@ -1,2 +1,3 @@
 /.password.txt
-/english_definations/oxford_api_key.enc
+/english_definitions/oxford_api_key.enc
+*/__pycache__
