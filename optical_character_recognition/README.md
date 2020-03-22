@@ -15,3 +15,6 @@ python ocr.py ocr.jpg
 pytesseract==0.3.3
 opencv-python==4.2.0.32
 ```
+
+TODO:
+1. Integrate Flask for Web
