@@ -1,3 +1,4 @@
+# English Word Definitions
 
 * Sign in to Oxford dictionary API - [Oxford Dictionaries](https://developer.oxforddictionaries.com/) and 
 get the `app_id` and `app_key`
@@ -12,14 +13,20 @@ app_key = <your_app_keys>
 ```python
 python definition.py Example
  ```
+
 * Output
 ```python
 Word: Example
 
-English definition: a thing characteristic of its kind or illustrating a general rule
-English definition: a person or thing regarded in terms of their fitness to be imitated
-English definition: be illustrated or exemplified
+(1) definition: a thing characteristic of its kind or illustrating a general rule
+(2) definition: a person or thing regarded in terms of their fitness to be imitated
+(3) definition: be illustrated or exemplified
+```
+
+#### Requirements
+```
+cryptography==2.8
 ```
 
 TODO:
-1. Check if the word is correct or not
+1. Check if the input word is correct or not. Suggest with nearest word.

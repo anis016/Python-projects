@@ -35,10 +35,12 @@ def get_definition(headers, url):
 
 
 def print_definition(results):
+    count = 1
     for lexical_entry in results['lexicalEntries']:
         for entry in lexical_entry['entries']:
             for sense in entry['senses']:
-                print('English definition: {0}'.format(sense['definitions'][0]))
+                print('({0}) definition: {1}'.format(sense['definitions'][0], count))
+                count += 1
 
 
 if __name__ == "__main__":
