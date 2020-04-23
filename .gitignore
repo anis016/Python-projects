@@ -1,3 +1,4 @@
 /.password.txt
 /english_definitions/oxford_api_key.enc
 */__pycache__
+/headless_scrapper/.config
