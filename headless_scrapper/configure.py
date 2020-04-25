@@ -4,10 +4,67 @@ from zipfile import ZipFile
 import subprocess
 import re
 import xml.etree.ElementTree as ElementTree
+import random
+from bs4 import BeautifulSoup
+import pickle
+from itertools import cycle
 
-headers = {
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
-}
+USER_AGENT_LIST = [
+    # Chrome
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+    # Firefox
+    'Mozilla/4.0 (compatible; MSIE 9.0; Windows NT 6.1)',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)',
+    'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (Windows NT 6.2; WOW64; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.0; Trident/5.0)',
+    'Mozilla/5.0 (Windows NT 6.3; WOW64; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64; Trident/7.0; rv:11.0) like Gecko',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)',
+    'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'
+]
+
+user_agent = random.choice(USER_AGENT_LIST)
+headers = {'user-agent': user_agent}
+
+
+def get_proxies():
+    if not os.path.exists('proxies.pkl'):
+        print("proxies not found... retrieving list of proxies")
+        proxy_url = 'https://free-proxy-list.net/'
+        r = requests.get(proxy_url, headers=headers)
+        r.raise_for_status()
+        if r.status_code == 200:
+            try:
+                soup = BeautifulSoup(r.text, 'html5lib')
+                soup_tr = soup.find('table').find('tbody').find_all('tr')
+                proxies = set()
+                for tr in soup_tr:
+                    ip = tr.find_all('td')[0].text
+                    port = tr.find_all('td')[1].text
+                    proxy = ":".join([ip, port])
+                    proxies.add(proxy)
+                with open('proxies.pkl', 'wb') as handle:
+                    pickle.dump(proxies, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            except requests.exceptions.HTTPError as err:
+                print("exception in requests " + str(err))
+                raise SystemExit(err)
+    with open('proxies.pkl', 'rb') as handle:
+        proxies = pickle.load(handle)
+        return proxies
 
 
 def create_driver_folder():
@@ -60,6 +117,7 @@ def parse_chrome_driver_version():
 
 
 def download_chrome_driver(driver_path):
+    proxies = get_proxies()
     file_path_driver = os.path.join(driver_path, "chromedriver")
 
     # if exists then return the driver path
@@ -119,5 +177,7 @@ def get_chrome_driver():
 
 
 if __name__ == "__main__":
-    chrome_driver_path = get_chrome_driver()
-    print(chrome_driver_path)
+    proxies = get_proxies()
+    print(proxies)
+    # chrome_driver_path = get_chrome_driver()
+    # print(chrome_driver_path)

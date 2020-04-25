@@ -1,23 +1,27 @@
 from selenium import webdriver
-from selenium.webdriver.common.by import By
+from selenium.webdriver.common.proxy import Proxy, ProxyType
 import configure
+from configure import USER_AGENT_LIST
 import json
 from _collections import defaultdict
 import time
+import random
+import requests
+
+user_agent = random.choice(USER_AGENT_LIST)
+headers = {'user-agent': user_agent}
 
 
 def get_browser():
-    user_agent = '''
-    Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36
-    '''
+    proxy = Proxy()
     options = webdriver.ChromeOptions()
-#    options.add_argument("--headless")
+    #    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument('user-agent={0}'.format(user_agent))
     driver_path = configure.get_chrome_driver()
-    return webdriver.Chrome(executable_path=driver_path, options=options)
+    return webdriver.Chrome(executable_path=driver_path, options=options, desired_capabilities=capabilities)
 
 
 def sanitize_json(json_string):
@@ -71,6 +75,8 @@ def get_page_contents(browser, page):
 
 
 if __name__ == "__main__":
-    page = 'https://www.educative.io/courses/learn-dart-first-step-to-flutter'
-    browser = get_browser()
-    get_page_contents(browser=browser, page=page)
+    # page = 'https://www.educative.io/courses/learn-dart-first-step-to-flutter'
+    # browser = get_browser()
+    # get_page_contents(browser=browser, page=page)
+    proxies = get_proxies()
+    print(proxies)
