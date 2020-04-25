@@ -117,7 +117,6 @@ def parse_chrome_driver_version():
 
 
 def download_chrome_driver(driver_path):
-    proxies = get_proxies()
     file_path_driver = os.path.join(driver_path, "chromedriver")
 
     # if exists then return the driver path
