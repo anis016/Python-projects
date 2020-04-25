@@ -42,29 +42,32 @@ headers = {'user-agent': user_agent}
 
 
 def get_proxies():
-    if not os.path.exists('proxies.pkl'):
-        print("proxies not found... retrieving list of proxies")
-        proxy_url = 'https://free-proxy-list.net/'
-        r = requests.get(proxy_url, headers=headers)
-        r.raise_for_status()
-        if r.status_code == 200:
-            try:
-                soup = BeautifulSoup(r.text, 'html5lib')
-                soup_tr = soup.find('table').find('tbody').find_all('tr')
-                proxies = set()
-                for tr in soup_tr:
-                    ip = tr.find_all('td')[0].text
-                    port = tr.find_all('td')[1].text
-                    proxy = ":".join([ip, port])
-                    proxies.add(proxy)
-                with open('proxies.pkl', 'wb') as handle:
-                    pickle.dump(proxies, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            except requests.exceptions.HTTPError as err:
-                print("exception in requests " + str(err))
-                raise SystemExit(err)
-    with open('proxies.pkl', 'rb') as handle:
-        proxies = pickle.load(handle)
-        return proxies
+    print("proxies not found... retrieving list of proxies")
+    proxy_url = 'https://free-proxy-list.net/'  # doesn't work, better to not use it
+    r = requests.get(proxy_url, headers=headers)
+    r.raise_for_status()
+    proxies = set()
+    if r.status_code == 200:
+        try:
+            soup = BeautifulSoup(r.text, 'html5lib')
+            soup_tr = soup.find('table').find('tbody').find_all('tr')
+            for tr in soup_tr:
+                ip = tr.find_all('td')[0].text
+                port = tr.find_all('td')[1].text
+                proxy = ":".join([ip, port])
+                proxies.add(proxy)
+        except requests.exceptions.HTTPError as err:
+            print("exception in requests " + str(err))
+            raise SystemExit(err)
+
+    # writing pickle in a file
+    # with open('proxies.pkl', 'wb') as handle:
+    #    pickle.dump(proxies, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # writing pickle from a file
+    # with open('proxies.pkl', 'rb') as handle:
+    #    proxies = pickle.load(handle)
+
+    return proxies
 
 
 def create_driver_folder():
