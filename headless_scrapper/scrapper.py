@@ -1,28 +1,32 @@
 from selenium import webdriver
 from selenium.webdriver.common.proxy import Proxy, ProxyType
-import configure
+from configure import USER_AGENT_LIST
+from configure import get_proxies
+from configure import get_chrome_driver
 import json
-from _collections import defaultdict
+from collections import defaultdict
 import time
-import random
 import requests
 import random
-from itertools import cycle
+import pickle
+from datetime import date
+import random
 
-user_agent = random.choice(configure.USER_AGENT_LIST)
+user_agent = random.choice(USER_AGENT_LIST)
 headers = {'user-agent': user_agent}
 
 
 def get_browser():
-    proxy = random.choice(list(configure.get_proxies()))
+    # TODO: get fast and secure proxy and also resolve proxy wth no internet
+    # proxy = random.choice(list(get_proxies()))
     options = webdriver.ChromeOptions()
-    #    options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument('user-agent={0}'.format(user_agent))
-    options.add_argument('--proxy-server=http://{0}'.format(proxy))
-    driver_path = configure.get_chrome_driver()
+    # options.add_argument('--proxy-server=http://{0}'.format(proxy))
+    driver_path = get_chrome_driver()
     return webdriver.Chrome(executable_path=driver_path, options=options)
 
 
@@ -46,7 +50,6 @@ def get_user_password():
 def get_page_contents(browser, page):
     email, password = get_user_password()
     print(page)
-
     browser.get(page)
     browser.find_element_by_xpath('//*[@id="app"]/div[1]/div[3]/nav/div[3]/button[2]/span').click()
     browser.find_element_by_id('loginform-email').send_keys(email)
@@ -71,7 +74,10 @@ def get_page_contents(browser, page):
         content_download[chapter_title] = content_links
         time.sleep(3)
     browser.quit()
-    print(content_download)
+    # serialize and save the content_download for later use
+    content_filename = '{0}-{1}.pkl'.format(page, date)
+    with open(content_filename, 'wb') as handle:
+        pickle.dump(content_download, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == "__main__":
