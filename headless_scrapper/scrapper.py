@@ -37,7 +37,7 @@ def get_user_password():
     return email, password
 
 
-def connect_to_page(browser, page):
+def get_page_contents(browser, page):
     email, password = get_user_password()
     print(page)
     print(email)
@@ -73,4 +73,4 @@ def connect_to_page(browser, page):
 if __name__ == "__main__":
     page = 'https://www.educative.io/courses/learn-dart-first-step-to-flutter'
     browser = get_browser()
-    connect_to_page(browser=browser, page=page)
+    get_page_contents(browser=browser, page=page)
