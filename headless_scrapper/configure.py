@@ -40,6 +40,7 @@ def get_user_agent(page):
         SystemExit("no user-agent found.. exiting.")
 
 
+# TODO: this is called twice, this needs to be handled
 user_agent, headers = get_user_agent("https://www.educative.io")
 
 
