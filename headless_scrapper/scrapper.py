@@ -1,6 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.proxy import Proxy, ProxyType
-from configure import USER_AGENT_LIST
+from configure import get_user_agent
 from configure import get_proxies
 from configure import get_chrome_driver
 import json
@@ -13,14 +13,13 @@ import pickle
 from datetime import date
 import random
 
-user_agent = random.choice(USER_AGENT_LIST)
-headers = {'user-agent': user_agent}
+user_agent, headers = get_user_agent("https://www.educative.io")
 
 
 def get_browser(proxy=False):
     options = webdriver.ChromeOptions()
     # options.add_argument("--headless")
-    options.add_argument('user-agent={0}'.format(user_agent))
+    # options.add_argument('user-agent={0}'.format(user_agent))
     if proxy:
         options.add_argument('--proxy-server={0}'.format(proxy))
     driver_path = get_chrome_driver()
@@ -84,7 +83,7 @@ def get_page_contents(browser, page):
 
 
 if __name__ == "__main__":
-    page = 'https://www.educative.io/courses/learn-dart-first-step-to-flutter'
+    # page = 'https://www.educative.io/courses/learn-dart-first-step-to-flutter'
     page = "https://www.educative.io/courses/python-201-interactively-learn-advanced-concepts-in-python-3"
 
     # TODO: get fast and secure proxy and also resolve proxy wth no internet
@@ -97,7 +96,6 @@ if __name__ == "__main__":
     #     print("Request #{0} for proxy {1}".format(count, proxy))
     #     try:
     #         response = requests.get(page, proxies={"http": proxy, "https": proxy}, headers=headers, timeout=10.0)
-    #         print(response.json())
     #         print("got a proxy.. breaking")
     #         break
     #     except Exception as exception:

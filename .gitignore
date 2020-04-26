@@ -3,3 +3,4 @@
 */__pycache__
 /headless_scrapper/.config
 /headless_scrapper/drivers/
+*.pkl
